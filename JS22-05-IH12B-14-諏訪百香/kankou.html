@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>三重県観光ガイド</title>
+
+<!-- Google Maps -->
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAKLjisxFelKwIl1_G6MiEO9-ya7Twr5s"></script>
+
+<style>
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        background-color: #f7f4ed;
+        color: #333;
+    }
+
+
+    header {
+        background-color: #315c4a;
+        color: white;
+        text-align: center;
+        padding: 25px;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 32px;
+    }
+
+    header p {
+        margin: 8px 0 0;
+    }
+
+
+    /* カテゴリーボタン */
+    .category {
+        text-align: center;
+        padding: 20px;
+        background-color: white;
+    }
+
+    .category button {
+        border: none;
+        background-color: #315c4a;
+        color: white;
+        padding: 10px 18px;
+        margin: 5px;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+
+    .category button:hover {
+        background-color: #c99a5b;
+    }
+
+
+    /* 地図＋スポット一覧 */
+    .main {
+        display: flex;
+        width: 95%;
+        margin: 20px auto;
+        gap: 20px;
+    }
+
+
+    /* スポット一覧 */
+    .spot-list {
+        width: 35%;
+        background-color: white;
+        padding: 15px;
+        border-radius: 15px;
+        box-sizing: border-box;
+    }
+
+    .spot-list h2 {
+        margin-top: 0;
+        color: #315c4a;
+    }
+
+
+    /* スポットカード */
+    .spot-card {
+        background-color: #f7f4ed;
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .spot-card:hover {
+        background-color: #eee5d4;
+    }
+
+    .spot-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .spot-card h3 {
+        margin: 8px 0 5px;
+        color: #315c4a;
+    }
+
+    .spot-card p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+
+
+    /* GoogleMap */
+    #map {
+        width: 65%;
+        height: 600px;
+        border-radius: 15px;
+    }
+
+</style>
+
+</head>
+
+
+<body>
+
+<header>
+
+<h1>三重県観光ガイド</h1>
+<p>三重県のおすすめ観光スポットを紹介します</p>
+
+</header>
+
+
+<div class="category">
+
+    <button onclick="showAll()">すべて</button>
+    <button onclick="showShrine()">神社</button>
+    <button onclick="showLeisure()">レジャー</button>
+    <button onclick="showAquarium()">水族館</button>
+
+</div>
+
+
+<div class="main">
+
+    <!-- スポット一覧 -->
+    <div class="spot-list">
+
+        <h2>おすすめスポット</h2>
+
+        <!-- 伊勢神宮 -->
+        <div class="spot-card shrine" onclick="moveToIse()">
+            <img src="images/ise.jpg">
+            <h3>伊勢神宮</h3>
+            <p>神社・歴史</p>
+            <p>おすすめ度 ★★★★★</p>
+            <p>
+                日本を代表する神社。
+                三重県を代表する観光スポットです。
+            </p>
+        </div>
+
+
+        <!-- ナガシマ -->
+        <div class="spot-card leisure" onclick="moveToNagasupa()">
+            <img src="images/nagasupa.jpg">
+            <h3>ナガシマスパーランド</h3>
+            <p>レジャー・遊園地</p>
+            <p>おすすめ度 ★★★★★</p>
+            <p>
+                大型遊園地やプールなどを
+                楽しむことができます。
+            </p>
+        </div>
+
+
+        <!-- 鳥羽水族館 -->
+        <div class="spot-card aquarium" onclick="moveToToba()">
+            <img src="images/toba.jpg">
+            <h3>鳥羽水族館</h3>
+            <p>水族館</p>
+            <p>おすすめ度 ★★★★★</p>
+            <p>
+                多くの海の生き物を見ることが
+                できる人気スポットです。
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Google Map -->
+
+    <div id="map"></div>
+
+</div>
+
+<script>
+
+//GoogleMap
+function initMap() {
+
+    // マップ
+    const map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+            zoom: 9,
+            center: {
+                lat: 34.734120346739296,
+                lng: 136.51027022208768
+            },
+            zoomControl: true,
+            mapTypeControl: true,
+            streetViewControl: false
+        }
+    );
+
+//マーカー
+
+    // 伊勢神宮
+    const ise = new google.maps.Marker({
+        position: {
+            lat: 34.462546504810376,
+            lng: 136.72278644713955
+        },
+        map: map,
+        title: "伊勢神宮"
+    });
+
+
+    // ナガシマ
+    const nagasupa = new google.maps.Marker({
+        position: {
+            lat: 35.02839526971735,
+            lng: 136.72780315344917
+        },
+        map: map,
+        title: "ナガシマスパーランド"
+    });
+
+
+    // 鳥羽水族館
+    const toba = new google.maps.Marker({
+        position: {
+            lat: 34.48236125670775,
+            lng: 136.84556425396525
+        },
+        map: map,
+        title: "鳥羽水族館"
+    });
+
+
+//情報ウィンドウ
+
+    // 伊勢神宮
+    const infoIse = new google.maps.InfoWindow({
+        content: `
+            <h2>伊勢神宮</h2>
+            <img src="images/ise.jpg" width="220">
+            <p>
+                日本を代表する神社です。<br>
+                神社までには「おかげ横丁」と呼ばれる<br>
+                昔ながらの街並みに様々なグルメや<br>
+                お土産が立ち並んでいます。
+            </p>
+            <p>神社・歴史</p>
+        `
+    });
+
+
+    // ナガシマ
+    const infoNagasupa = new google.maps.InfoWindow({
+        content: `
+            <h2>ナガシマスパーランド</h2>
+            <img src="images/nagasupa.jpg" width="220">
+            <p>
+                大型遊園地やプールなどを楽しむことが<br>
+                できる人気のレジャースポットです。<br>
+                同じ敷地内に三井アウトレットパークも<br>
+                あるのでショッピングも楽しむことができます。
+            </p>
+        `
+    });
+
+
+    // 鳥羽水族館
+    const infoToba = new google.maps.InfoWindow({
+        content: `
+            <h2>鳥羽水族館</h2>
+            <img src="images/toba.jpg" width="220">
+            <p>
+                ラッコをはじめとする様々な生き物が<br>
+                のびのびと生活する姿を見ることができます。<br>
+                生き物とのふれあいの場が多く、より近くで<br>
+                ご覧いただける施設です。
+            </p>
+            <p>水族館</p>
+        `
+    });
+
+
+//マーカークリック
+    ise.addListener("click", () => {
+        infoIse.open(map, ise);
+    });
+
+
+    nagasupa.addListener("click", () => {
+        infoNagasupa.open(map, nagasupa);
+    });
+
+
+    toba.addListener("click", () => {
+        infoToba.open(map, toba);
+    });
+
+
+//カードクリック
+
+    window.moveToIse = function() {
+        map.setCenter({
+            lat: 34.462546504810376,
+            lng: 136.72278644713955
+        });
+        map.setZoom(15);
+        infoIse.open(map, ise);
+    };
+
+
+    window.moveToNagasupa = function() {
+        map.setCenter({
+            lat: 35.02839526971735,
+            lng: 136.72780315344917
+        });
+        map.setZoom(15);
+        infoNagasupa.open(map, nagasupa);
+    };
+
+
+    window.moveToToba = function() {
+        map.setCenter({
+            lat: 34.48236125670775,
+            lng: 136.84556425396525
+        });
+        map.setZoom(15);
+        infoToba.open(map, toba);
+    };
+
+
+//カテゴリー表示
+
+    window.showAll = function() {
+        document.querySelectorAll(".spot-card")
+        .forEach(card => {
+            card.style.display = "block";
+        });
+    };
+
+
+    window.showShrine = function() {
+        document.querySelectorAll(".spot-card")
+        .forEach(card => {
+            if (card.classList.contains("shrine")) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    };
+
+
+    window.showLeisure = function() {
+        document.querySelectorAll(".spot-card")
+        .forEach(card => {
+            if (card.classList.contains("leisure")) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    };
+
+
+    window.showAquarium = function() {
+        document.querySelectorAll(".spot-card")
+        .forEach(card => {
+            if (card.classList.contains("aquarium")) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    };
+
+}
+
+
+
+window.initMap = initMap;
+
+
+window.addEventListener("load", () => {
+
+    initMap();
+
+});
+
+</script>
+
+</body>
+</html>
